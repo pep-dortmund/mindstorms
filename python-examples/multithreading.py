@@ -11,6 +11,7 @@ from __future__ import print_function, division
 from tankbot import TankBot
 from threading import Thread, Event
 from datetime import datetime
+from time import sleep
 
 
 def wiggle_wiggle(bot, stop_event):
@@ -65,7 +66,7 @@ if __name__ == '__main__':
             # this is needed to stay in the try except block
             # otherwise we could never terminate the program
             while True:
-                pass
+                sleep(10)
     except (KeyboardInterrupt, SystemExit):
         # on ctrl+c: stop the threads, then exit
         stop_event.set()
