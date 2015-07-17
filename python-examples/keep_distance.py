@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 '''
-This script demonstrates how to use multithreading in
-python to do several tasks (nearly) at once.
 In this example, we let the TankBot keep a
 distance to a target.
 '''
