@@ -16,9 +16,9 @@ def keep_distance(bot, target_distance):
         setpoint=target_distance,
         func=lambda : bot.ultrasonic_sensor.dist_cm,
         kp=-5,
-        ki=-1,
-        kd=0,
-        tau=10,
+        ki=-2,
+        kd=-0.5,
+        tau=5,
         limits=[-100, 100]
     )
     while True:
