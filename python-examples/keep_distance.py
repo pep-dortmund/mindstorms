@@ -6,24 +6,28 @@ distance to a target.
 '''
 from __future__ import print_function, division
 from tankbot import TankBot
+from controller import PID
 
 
 def keep_distance(bot, target_distance):
     speed = 0
     bot.run_direct(speed)
+    controller = PID(
+        setpoint=target_distance,
+        func=lambda : bot.ultrasonic_sensor.dist_cm,
+        kp=-5,
+        ki=-1,
+        kd=0,
+        tau=10,
+        limits=[-100, 100]
+    )
     while True:
-        current_distance = bot.ultrasonic_sensor.dist_cm
-        difference = current_distance - target_distance
-        if difference > 0:
-            speed = min(5*difference, 100)
-        else:
-            speed = max(200 * difference / target_distance, -100)
-        bot.speed = speed
+        bot.speed = controller()
 
 
 if __name__ == '__main__':
     try:
         with TankBot() as bot:
-            keep_distance(bot, 10)
+            keep_distance(bot, 20)
     except (KeyboardInterrupt, SystemExit):
         pass
