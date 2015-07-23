@@ -22,7 +22,9 @@ class PID(object):
             the weight for the integral term
         kd : float
             the weight for the differential term
-
+        tau : integer
+            number of measurements to use for integral and
+            mean of derivative
         limits : 2-tuple
             value range for the return value
         '''
@@ -46,10 +48,10 @@ class PID(object):
 
         P = self.kp * error
         I = self.ki * self.last_errors.sum()
-        D = self.kd * (self.last_errors[-1] - self.last_errors[-2])
+        D = self.kd * np.mean(np.diff(self.last_errors))
 
         PID = P + I + D
-        
+
         if PID < self.limits[0]:
             PID = self.limits[0]
         elif PID > self.limits[1]:
