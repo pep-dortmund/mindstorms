@@ -13,8 +13,6 @@ http://www.ev3dev.org/downloads/
 2. Use etcher https://etcher.io/ to burn the image onto the MicroSD card
 
 ## Setup
-
-### Hostname
 Setup is most easily done via the usb ethernet connection.
 Connect the brick to a network and boot. 
 
@@ -24,8 +22,8 @@ ssh robot@ev3dev.local
 ```
 The standard password is `maker`.
 
-1. Change hostname
 
+### Hostname
 Change the hostname to `pepbot<N>`, where `<N>` is a running number for the bots.
 
 To do this, open `/etc/hostname` and edit it to contain the desired hostname, e.g. using
@@ -47,4 +45,16 @@ Install some usefull packages.
 sudo apt update
 sudo apt upgrade
 sudo apt install python3-msgpack python3-zmq python3-numpy ipython3 python3-pip
+```
+
+### Add pep user, remove standard user
+
+```
+sudo useradd -G users,sudo,tty,dialout,cdrom,floppy,audio,video,plugdev,input,bluetooth,i2c,ev3dev -m  pep
+sudo passwd pep
+```
+
+Log out and log back in as the `pep` user, then run
+```
+sudo deluser --remove-home robot
 ```
