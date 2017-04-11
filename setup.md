@@ -45,5 +45,6 @@ Be sure to use `tee -a` here, otherwise we will overwrite the file instead of ap
 Install some usefull packages.
 ```
 sudo apt update
+sudo apt upgrade
 sudo apt install python3-msgpack python3-zmq python3-numpy ipython3 python3-pip
 ```
