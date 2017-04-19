@@ -43,9 +43,9 @@ class MarbleSorter:
     @property
     def empty(self):
         return all((
-            37 < self.sensor.red < 44,
-            25 < self.sensor.green < 32,
-            60 < self.sensor.blue < 70,
+            33 < self.sensor.red < 43,
+            22 < self.sensor.green < 32,
+            59 < self.sensor.blue < 69,
         ))
 
     def measure(self, num_values, interval=0.01):
@@ -78,10 +78,10 @@ def main():
             socket.send_pyobj(color_values)
             socket.recv()
             t1 = time.perf_counter()
-            print('Sending values took {} seconds'.format(t1 -t0))
+            print('Sending values took {} seconds'.format(t1 - t0))
 
             sorter.eject()
-            time.sleep(0.2)
+            time.sleep(0.5)
 
 
 if __name__ == '__main__':
