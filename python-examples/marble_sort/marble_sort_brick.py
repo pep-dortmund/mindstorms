@@ -1,8 +1,14 @@
 from ev3dev.ev3 import MediumMotor, ColorSensor
 from argparse import ArgumentParser
 import time
+import zmq
+
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
 
 parser = ArgumentParser()
+parser.add_argument('server')
+parser.add_argument('-p', '--port', type=int, default=5000)
 parser.add_argument('-m', '--motor-port', default='A')
 parser.add_argument('-s', '--sensor-port', default='1')
 
@@ -18,11 +24,9 @@ class MarbleSorter:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.motor.stop()
-        self.motor.reset()
 
     def eject(self, speed=0.3):
         self.motor.stop()
-        self.motor.reset()
         self.motor.stop_action = self.motor.STOP_ACTION_HOLD
         self.motor.position_sp = -120
         self.motor.speed_sp = int(speed * self.motor.max_speed)
@@ -30,25 +34,54 @@ class MarbleSorter:
         self.motor.wait_until('holding', timeout=2000)
 
     def run_motor(self, speed=0.3):
-        self.motor.reset()
         self.motor.speed_sp = int(speed * self.motor.max_speed)
         self.motor.run_forever()
 
     def stop(self):
         self.motor.stop()
 
+    @property
+    def empty(self):
+        return all((
+            37 < self.sensor.red < 44,
+            25 < self.sensor.green < 32,
+            60 < self.sensor.blue < 70,
+        ))
+
+    def measure(self, num_values, interval=0.01):
+        self.run_motor()
+        values = []
+        for i in range(num_values):
+            values.append(dict(zip('rgb', self.sensor.raw)))
+            time.sleep(interval)
+
+        self.stop()
+        return values
+
 
 def main():
 
     args = parser.parse_args()
 
+    socket.connect('tcp://{}:{}'.format(args.server, args.port))
+
     print('Starting')
     with MarbleSorter(args.motor_port, args.sensor_port) as sorter:
 
         while True:
+            while sorter.empty:
+                time.sleep(0.1)
+
+            time.sleep(0.2)
+            t0 = time.perf_counter()
+            color_values = sorter.measure(100)
+            socket.send_pyobj(color_values)
+            socket.recv()
+            t1 = time.perf_counter()
+            print('Sending values took {} seconds'.format(t1 -t0))
+
             sorter.eject()
-            sorter.run_motor()
-            time.sleep(5)
+            time.sleep(0.2)
 
 
 if __name__ == '__main__':
